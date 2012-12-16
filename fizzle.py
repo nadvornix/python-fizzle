@@ -5,14 +5,15 @@
 
 '''
 
-def dl_distance(s1,s2,substitutions=[],symetric=True):
+def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False):
 	"""
 	Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
 	substitutions is list of tuples of characters (what, substituted by what, cost), 
 		maximal value of substitution is 2 (ie: cost deletion & insertion that would be otherwise used)
 		eg: substitutions=[('a','e',0.4),('i','y',0.3)]
 	symetric=True mean that cost of substituting A with B is same as B with A
-
+	returnMatrix=True: the matrix of distances will be returned, if returnMatrix==False, then only distance will be returned
+	printMatrix==True: matrix of distances will be printed
 	"""
 	from collections import defaultdict
 	subs=defaultdict(lambda :1)
@@ -41,16 +42,20 @@ def dl_distance(s1,s2,substitutions=[],symetric=True):
 				matrix[i+1][j+1] = min([matrix[i+1][j+1],
 									matrix[i-1][j-1]+cost])
 
-	# print "     ",
-	# for i in s2:
-	# 	print i,"",
-	# print 
-	# for i,r in enumerate(matrix):
-	# 	if i==0:
-	# 		print " ",r
-	# 	else:
-	# 		print s1[i-1],r
-	return matrix[-1][-1]
+	if printMatrix:
+		print "     ",
+		for i in s2:
+			print i,"",
+		print 
+		for i,r in enumerate(matrix):
+			if i==0:
+				print " ",r
+			else:
+				print s1[i-1],r
+	if returnMatrix:
+		return matrix
+	else:
+		return matrix[-1][-1]
 
 def match_list(s, l, **kw):
 	'''
