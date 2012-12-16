@@ -1,6 +1,8 @@
 ## python-fizzle
 
-Damerau–Levenshtein distance (fuzzy string matching) for python with support of unicode and custom edit costs
+Damerau–Levenshtein distance and fuzzy substring matching for python with support of unicode and custom edit costs
+
+Cost for each insertion, deletion and character transposition is 1.
 
 ## Examples:
 ```python
