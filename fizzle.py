@@ -5,7 +5,7 @@
 
 '''
 
-def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False):
+def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False, nonMatchingEnds=False):
 	"""
 	Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
 	substitutions is list of tuples of characters (what, substituted by what, cost), 
@@ -16,14 +16,17 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 	printMatrix==True: matrix of distances will be printed
 	"""
 	from collections import defaultdict
-	subs=defaultdict(lambda :1)
+	subs=defaultdict(lambda : 1)	#default cost of substitution is 1
 	for a,b,v in substitutions:
 		subs[(a,b)]=v
 		if symetric:
 			subs[(b,a)]=v
 	
-	row=(1+len(s2))*[0.]
-	matrix=[[i+j for j in range(len(s2)+1)] for i in range(len(s1)+1)]	#matrix |s1|+1 x |s2|+1
+	if nonMatchingEnds:
+		matrix=[[j for j in range(len(s2)+1)] for i in range(len(s1)+1)]
+	else:	#start and end are aligned
+		matrix=[[i+j for j in range(len(s2)+1)] for i in range(len(s1)+1)]	
+	#matrix |s1|+1 x |s2|+1 big. Only values at border matter
 
 	for i in range(len(s1)):
 		for j in range(len(s2)):
@@ -58,7 +61,11 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 		return matrix[-1][-1]
 
 def dl_ratio(s1,s2,**kw):
-	return 1 - dl_distance(s1,s2,**kw)/(1.0*len(s1)+len(s2))
+	'returns distance between s1&s2 as number between [0..1] where 1 is total match and 0 is no match'
+	try:
+		return 1 - (dl_distance(s1,s2,**kw))/(2.0*max(len(s1),len(s2)))
+	except ZeroDivisionError:
+		return 0.0
 
 def match_list(s, l, **kw):
 	'''
@@ -78,6 +85,52 @@ def pick_one(s,l,**kw):
 	except IndexError:
 		return None
 
+
+def substring_match(text,s,**kw):#TODO: isn't backtracking too greedy?
+"""
+fuzzy substring searching for text in s
+"""
+	for k in ("nonMatchingEnds", "returnMatrix"):
+		if kw.has_key(k):
+			del kw[k]
+
+	matrix=dl_distance(s,text, returnMatrix=True, nonMatchingEnds=True, **kw)
+
+	minimum=float('inf')
+	minimumI=0
+	for i,row in enumerate(matrix):
+		if row[-1] < minimum:
+			minimum=row[-1]
+			minimumI=i
+	
+	x=len(matrix[0])-1
+	y=minimumI
+	
+	#backtrack:
+	while x>0:
+		locmin=min(matrix[y][x-1],
+			matrix[y-1][x-1],
+			matrix[y-1][x])
+		if matrix[y-1][x-1] == locmin:
+			y,x=y-1,x-1
+		elif matrix[y][x-1] == locmin:
+			x=x-1
+		elif matrix[y-1][x] == locmin:
+			y=y-1
+
+	return minimum,(y-1,minimumI)
+
+def substring_score(s,text,**kw):
+	return substring_match(s, text, **kw)[0]
+
+def substring_position(s,text,**kw):
+	return substring_match(s, text, **kw)[1]
+
+def substring_search(s, text, **kw):
+	score, (start,end) = substring_match(s, text, **kw)
+	# print score, (start, end)
+	return text[start:end]
+
 if __name__=="__main__":
 	#examples:
 
@@ -89,3 +142,5 @@ if __name__=="__main__":
 	print match_list("Levenshtein", misspellings, substitutions=commonErrors)
 	print pick_N("Levenshtein", misspellings, 2, substitutions=commonErrors)
 	print pick_one("Levenshtein", misspellings, substitutions=commonErrors)
+
+	print substring_search("aaaabcegf","qqqqq aaaaWWbcdefg qqqq", printMatrix=True)

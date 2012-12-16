@@ -31,6 +31,24 @@ Damerau–Levenshtein distance (fuzzy string matching) for python with support o
 #Distance between word and words from list
 >>> match_list("Levenshtein", misspellings,substitutions=editCosts,symetric=False)
 [(0.65, 'Levenshtain'), (1, 'Levenstein'), (2, 'Levinstein'), (3, 'Levistein'), (1, 'Levemshtein')]
+```
+
+#### Fuzzy substring search
+```python
+from fizzle import *
+
+#fuzzy find substring
+>>> substring_search("aabcegf","aa aaWbcdefg a")
+'aaWbcdef'
+
+#fuzzy find substring, returns (distance, (start, end))
+>>> substring_match("aabcegf","aa aaWbcdefg a")
+(3, (3, 11))
+
+# substring_position and substring_score is same as substring_match but returs only position or distance respectively
+
+
+
 
 ```
 
