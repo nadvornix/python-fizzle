@@ -1,8 +1,5 @@
-
+#-*- encoding: utf8 -*-
 '''TODO:
-- better unicode support
-- write docs
-
 '''
 
 def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False, nonMatchingEnds=False):
@@ -15,6 +12,11 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 	returnMatrix=True: the matrix of distances will be returned, if returnMatrix==False, then only distance will be returned
 	printMatrix==True: matrix of distances will be printed
 	"""
+	if not isinstance(s1,unicode):
+		s1=	unicode(s1, "utf8")
+	if not isinstance(s2,unicode):
+		s2=	unicode(s2, "utf8")
+
 	from collections import defaultdict
 	subs=defaultdict(lambda : 1)	#default cost of substitution is 1
 	for a,b,v in substitutions:
@@ -87,9 +89,9 @@ def pick_one(s,l,**kw):
 
 
 def substring_match(text,s,**kw):#TODO: isn't backtracking too greedy?
-"""
-fuzzy substring searching for text in s
-"""
+	"""
+	fuzzy substring searching for text in s
+	"""
 	for k in ("nonMatchingEnds", "returnMatrix"):
 		if kw.has_key(k):
 			del kw[k]
@@ -144,3 +146,4 @@ if __name__=="__main__":
 	print pick_one("Levenshtein", misspellings, substitutions=commonErrors)
 
 	print substring_search("aaaabcegf","qqqqq aaaaWWbcdefg qqqq", printMatrix=True)
+
