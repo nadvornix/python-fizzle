@@ -57,6 +57,9 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 	else:
 		return matrix[-1][-1]
 
+def dl_ratio(s1,s2,**kw):
+	return 1 - dl_distance(s1,s2,**kw)/(1.0*len(s1)+len(s2))
+
 def match_list(s, l, **kw):
 	'''
 	returns list of elements of l with each element having assigned distance from s
@@ -76,10 +79,13 @@ def pick_one(s,l,**kw):
 		return None
 
 if __name__=="__main__":
+	#examples:
+
 	commonErrors=[('a','e',0.4),('i','y',0.3),('m','n',0.5)]
 	misspellings = ["Levenshtain","Levenstein","Levinstein","Levistein","Levemshtein"]
 
 	print dl_distance('dayme', 'dayne', substitutions=commonErrors)
+	print dl_ratio("Levenshtein","Levenshtein")
 	print match_list("Levenshtein", misspellings, substitutions=commonErrors)
 	print pick_N("Levenshtein", misspellings, 2, substitutions=commonErrors)
 	print pick_one("Levenshtein", misspellings, substitutions=commonErrors)
