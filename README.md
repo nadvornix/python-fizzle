@@ -10,7 +10,7 @@ Damerau–Levenshtein distance (fuzzy string matching) for python with support o
 2
 
 # custom edit costs:
->>> editCosts=[('a','e',0.4),	#(default edit costs are 1)
+>>> editCosts=[('a','e',0.4),	#default edit costs are 1
 		   ('e','a',0.65),
 		   ('i','y',0.3),
 		   ('m','n',0.5),
@@ -19,12 +19,12 @@ Damerau–Levenshtein distance (fuzzy string matching) for python with support o
 >>> dl_distance('Levenshtein', 'Lenevshtein', substitutions=editCosts,symetric=False)
 2
 
-#picking TOP 2 matches from list:
+#picking top 2 matches from list:
 >>> misspellings = ["Levenshtain","Levenstein","Levinstein","Levistein","Levenshtein"]
 >>> pick_N("Levenshtein", misspellings, 2)
 [(1, 'Levemshtein'), (1, 'Levenshtain')]
 
-#picking only best:
+#picking only best match:
 >>> pick_one("Levenshtein", misspellings)
 (1, 'Levemshtein')
 
@@ -42,15 +42,11 @@ from fizzle import *
 'aaWbcdef'
 
 #fuzzy find substring, returns (distance, (start, end))
->>> substring_match("aabcegf","aa aaWbcdefg a")
+>>> substring_match("aabcegf","aa aaWbcdefg a", substitutions=editCosts)
 (3, (3, 11))
 
-# substring_position and substring_score is same as substring_match but returs only position or distance respectively
-
-
-
-
 ```
+substring_position and substring_score is same as substring_match but returs only position or distance respectively
 
 ### LICENSE: MIT License
 ### AUTHOR: Jiri Nadvornik: nadvornik.jiri@gmail.com
