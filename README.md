@@ -9,17 +9,18 @@ Damerau–Levenshtein distance (fuzzy string matching) for python with support o
 >>> print dl_distance('Levenshtein', 'Lenevshtein')
 2
 
->>> misspellings = ["Levenshtain","Levenstein","Levinstein","Levistein","Levemshtein"]
-
 # custom edit costs:
->>> editCosts=[('a','e',0.4),
+>>> editCosts=[('a','e',0.4),	#(default edit costs are 1)
 		   ('e','a',0.65),
 		   ('i','y',0.3),
-		   ('m','n',0.5)]
+		   ('m','n',0.5),
+		   ('t','p',1.5)
+		   ]
 >>> dl_distance('Levenshtein', 'Lenevshtein', substitutions=editCosts,symetric=False)
 2
 
 #picking TOP 2 matches from list:
+>>> misspellings = ["Levenshtain","Levenstein","Levinstein","Levistein","Levenshtein"]
 >>> pick_N("Levenshtein", misspellings, 2)
 [(1, 'Levemshtein'), (1, 'Levenshtain')]
 
