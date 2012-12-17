@@ -96,7 +96,7 @@ def substring_match(text,s, transposition=True, **kw):#TODO: isn't backtracking 
 		if kw.has_key(k):
 			del kw[k]
 
-	matrix=dl_distance(s,text, returnMatrix=True, nonMatchingEnds=True, **kw)
+	matrix=dl_distance(s,text, returnMatrix=True, nonMatchingEnds=True, printMatrix=True, **kw)
 
 	minimum=float('inf')
 	minimumI=0
@@ -113,14 +113,15 @@ def substring_match(text,s, transposition=True, **kw):#TODO: isn't backtracking 
 		locmin=min(matrix[y][x-1],
 			matrix[y-1][x-1],
 			matrix[y-1][x])
-		if transposition and matrix[y-1][x-1] == locmin:
+		if matrix[y-1][x-1] == locmin:
 			y,x=y-1,x-1
-		elif matrix[y][x-1] == locmin:
-			x=x-1
 		elif matrix[y-1][x] == locmin:
 			y=y-1
+		elif matrix[y][x-1] == locmin:
+			x=x-1
 
-	return minimum,(y-1,minimumI)
+
+	return minimum,(y,minimumI)
 
 def substring_score(s,text,**kw):
 	return substring_match(s, text, **kw)[0]
