@@ -2,7 +2,7 @@
 '''TODO:
 '''
 
-def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False, nonMatchingEnds=False):
+def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False, nonMatchingEnds=False, transposition=True):
 	"""
 	Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
 	substitutions is list of tuples of characters (what, substituted by what, cost), 
@@ -11,6 +11,7 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 	symetric=True mean that cost of substituting A with B is same as B with A
 	returnMatrix=True: the matrix of distances will be returned, if returnMatrix==False, then only distance will be returned
 	printMatrix==True: matrix of distances will be printed
+	transposition=True (default): cost of transposition is 1. transposition=False: cost of transpositin is Infinity
 	"""
 	if not isinstance(s1,unicode):
 		s1=	unicode(s1, "utf8")
@@ -43,7 +44,7 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 							  matrix[i][j]+cost	#substitution or no change
 							])
 
-			if i>=1 and j>=1 and s1[i]==s2[j-1] and s1[i-1]==s2[j]:
+			if transposition and i>=1 and j>=1 and s1[i]==s2[j-1] and s1[i-1]==s2[j]:
 				matrix[i+1][j+1] = min([matrix[i+1][j+1],
 									matrix[i-1][j-1]+cost])
 
@@ -87,8 +88,7 @@ def pick_one(s,l,**kw):
 	except IndexError:
 		return None
 
-
-def substring_match(text,s,**kw):#TODO: isn't backtracking too greedy?
+def substring_match(text,s, transposition=True, **kw):#TODO: isn't backtracking too greedy?
 	"""
 	fuzzy substring searching for text in s
 	"""
@@ -113,7 +113,7 @@ def substring_match(text,s,**kw):#TODO: isn't backtracking too greedy?
 		locmin=min(matrix[y][x-1],
 			matrix[y-1][x-1],
 			matrix[y-1][x])
-		if matrix[y-1][x-1] == locmin:
+		if transposition and matrix[y-1][x-1] == locmin:
 			y,x=y-1,x-1
 		elif matrix[y][x-1] == locmin:
 			x=x-1

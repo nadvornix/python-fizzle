@@ -33,6 +33,14 @@ Cost for each insertion, deletion and character transposition is 1.
 #Distance between word and words from list
 >>> match_list("Levenshtein", misspellings,substitutions=editCosts,symetric=False)
 [(0.65, 'Levenshtain'), (1, 'Levenstein'), (2, 'Levinstein'), (3, 'Levistein'), (1, 'Levemshtein')]
+
+# Default cost of transposition is 1:
+>>> print dl_distance('AB', 'BA')
+1
+
+# LD distance without transposition is Levenshtein distance:
+>>> print dl_distance('AB', 'BA', transposition=False)
+2
 ```
 
 #### Fuzzy substring search
