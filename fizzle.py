@@ -77,7 +77,7 @@ def match_list(s, l, **kw):
 	return map( lambda x:(dl_distance(s,x,**kw),x), l)
 
 def pick_N(s, l, num=3,**kw):
-	''' picks top N string from options best matching with s 
+	''' picks top N strings from options best matching with s 
 		- if num is set then returns top num results instead of default three
 	'''
 	return sorted(match_list(s,l, **kw))[:num]
@@ -96,7 +96,7 @@ def substring_match(text,s, transposition=True, **kw):#TODO: isn't backtracking 
 		if kw.has_key(k):
 			del kw[k]
 
-	matrix=dl_distance(s,text, returnMatrix=True, nonMatchingEnds=True, printMatrix=True, **kw)
+	matrix=dl_distance(s,text, returnMatrix=True, nonMatchingEnds=True, **kw)
 
 	minimum=float('inf')
 	minimumI=0
@@ -133,6 +133,22 @@ def substring_search(s, text, **kw):
 	score, (start,end) = substring_match(s, text, **kw)
 	# print score, (start, end)
 	return text[start:end]
+
+def match_substrings(s, l, **kw):
+	'returns list of elements of l with each element having assigned distance from s'
+	return map( lambda x:(substring_score(x,s,**kw),x), l)
+
+def pick_N_substrings(s, l, num=3,**kw):
+	''' picks top N substrings from options best matching with s 
+		- if num is set then returns top num results instead of default three
+	'''
+	return sorted(match_substrings(s,l, **kw))[:num]
+
+def pick_one_substring(s,l,**kw):
+	try:
+		return pick_N_substrings(s,l,1,**kw)[0]
+	except IndexError:
+		return None
 
 if __name__=="__main__":
 	#examples:
