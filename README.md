@@ -59,12 +59,17 @@ from fizzle import *
 substring_position and substring_score is same as substring_match but returs only position or distance respectively
 
 #### Named parameters (work for all functions):
-substitutions (default []) - List of triples (A,B,c) meaning edit A->B have cost C. Default cost is 1
-symetric (defualt True) - If edit A->B have same cost as B->A 
-nonMatchingEnds (defualt False) - True=substring matching
-transposition (defualt True) -  True=use Damerau–Levenshtein. False=compute Levenshtein distance 
-secondHalfDiscount (defualt False) - Edits in second half of string will be discounted
-printMatrix (defualt False)	- Print matrix of edit distances
+* substitutions (default []) - List of triples (A,B,c) meaning edit A->B have cost C. Default cost is 1
+
+* symetric (defualt True) - If edit A->B have same cost as B->A 
+
+* nonMatchingEnds (defualt False) - True=substring matching
+
+* transposition (defualt True) -  True=use Damerau–Levenshtein. False=compute Levenshtein distance 
+
+* secondHalfDiscount (defualt False) - Edits in second half of string will be discounted
+
+* printMatrix (defualt False)	- Print matrix of edit distances
 
 ### LICENSE: MIT License
 ### AUTHOR: Jiri Nadvornik: nadvornik.jiri@gmail.com
