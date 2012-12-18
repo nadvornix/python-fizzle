@@ -2,7 +2,9 @@
 '''TODO:
 '''
 
-def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMatrix=False, nonMatchingEnds=False, transposition=True):
+def dl_distance(s1,s2,substitutions=[],symetric=True,
+	returnMatrix=False, printMatrix=False, nonMatchingEnds=False, transposition=True,
+	secondHalfDiscount=False):
 	"""
 	Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
 	substitutions is list of tuples of characters (what, substituted by what, cost), 
@@ -30,7 +32,8 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 	else:	#start and end are aligned
 		matrix=[[i+j for j in range(len(s2)+1)] for i in range(len(s1)+1)]	
 	#matrix |s1|+1 x |s2|+1 big. Only values at border matter
-
+	half1=len(s1)/2
+	half2=len(s2)/2
 	for i in range(len(s1)):
 		for j in range(len(s2)):
 			ch1,ch2=s1[i],s2[j]
@@ -38,9 +41,13 @@ def dl_distance(s1,s2,substitutions=[],symetric=True,returnMatrix=False, printMa
 				cost = 0
 			else:
 				cost = subs[(ch1,ch2)]
+			if secondHalfDiscount and (s1>half1 or s2 > half2):
+				deletionCost,insertionCost=0.6,0.6
+			else:
+				deletionCost,insertionCost=1,1
 
-			matrix[i+1][j+1]=min([matrix[i][j+1]+1, 	#deletion
-							  matrix[i+1][j]+1,	#insertion
+			matrix[i+1][j+1]=min([matrix[i][j+1]+deletionCost, 	#deletion
+							  matrix[i+1][j]+insertionCost,	#insertion
 							  matrix[i][j]+cost	#substitution or no change
 							])
 
@@ -134,7 +141,7 @@ def substring_search(s, text, **kw):
 	# print score, (start, end)
 	return text[start:end]
 
-def match_substrings(s, l, **kw):
+def match_substrings(s, l, score=False, **kw):
 	'returns list of elements of l with each element having assigned distance from s'
 	return map( lambda x:(substring_score(x,s,**kw),x), l)
 
