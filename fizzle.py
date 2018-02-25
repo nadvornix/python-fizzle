@@ -1,11 +1,9 @@
-#-*- encoding: utf-8 -*-
-'''TODO:
-'''
+# -*- encoding: utf-8 -*-
 
 
 def dl_distance(s1,
                 s2,
-                substitutions=[],
+                substitutions={},
                 symetric=True,
                 returnMatrix=False,
                 printMatrix=False,
@@ -13,32 +11,29 @@ def dl_distance(s1,
                 transposition=True,
                 secondHalfDiscount=False):
     """
-	Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
-	substitutions is list of tuples of characters (what, substituted by what, cost), 
-		maximal value of substitution is 2 (ie: cost deletion & insertion that would be otherwise used)
-		eg: substitutions=[('a','e',0.4),('i','y',0.3)]
-	symetric=True mean that cost of substituting A with B is same as B with A
-	returnMatrix=True: the matrix of distances will be returned, if returnMatrix==False, then only distance will be returned
-	printMatrix==True: matrix of distances will be printed
-	transposition=True (default): cost of transposition is 1. transposition=False: cost of transpositin is Infinity
-	"""
-    if not isinstance(s1, unicode):
-        s1 = unicode(s1, "utf8")
-    if not isinstance(s2, unicode):
-        s2 = unicode(s2, "utf8")
+    Return DL distance between s1 and s2. Default cost of substitution, insertion, deletion and transposition is 1
+    substitutions is list of tuples of characters (what, substituted by what, cost), 
+    maximal value of substitution is 2 (ie: cost deletion & insertion that would be otherwise used)
+    eg: substitutions=[('a','e',0.4),('i','y',0.3)]
+    symetric=True mean that cost of substituting A with B is same as B with A
+    returnMatrix=True: the matrix of distances will be returned, if returnMatrix==False, then only distance will be returned
+    printMatrix==True: matrix of distances will be printed
+    transposition=True (default): cost of transposition is 1. transposition=False: cost of transpositin is Infinity
+    """
 
-    subs = defaultdict(lambda: 1)  #default cost of substitution is 1
-    for a, b, v in substitutions:
-        subs[(a, b)] = v
+    if isinstance(substitutions, list):
+        subs_dict = {(from_, to): cost for from_, to, cost in substitutions}
         if symetric:
-            subs[(b, a)] = v
+            subs_dict.update({(to, from_)
+                              for from_, to, cost in substitutions})
+        substitutions = subs_dict
 
     if nonMatchingEnds:
         matrix = [[j for j in range(len(s2) + 1)] for i in range(len(s1) + 1)]
-    else:  #start and end are aligned
+    else:  # start and end are aligned
         matrix = [[i + j for j in range(len(s2) + 1)]
                   for i in range(len(s1) + 1)]
-    #matrix |s1|+1 x |s2|+1 big. Only values at border matter
+    # matrix |s1|+1 x |s2|+1 big. Only values at border matter
     half1 = len(s1) / 2
     half2 = len(s2) / 2
     for i in range(len(s1)):
@@ -47,35 +42,36 @@ def dl_distance(s1,
             if ch1 == ch2:
                 cost = 0
             else:
-                cost = subs[(ch1, ch2)]
+                if (ch1, ch2) in substitutions:
+                    cost = substitutions[(ch1, ch2)]
+                else:
+                    cost = 1
             if secondHalfDiscount and (s1 > half1 or s2 > half2):
                 deletionCost, insertionCost = 0.6, 0.6
             else:
                 deletionCost, insertionCost = 1, 1
 
             matrix[i + 1][j + 1] = min([
-                matrix[i][j + 1] + deletionCost,  #deletion
-                matrix[i + 1][j] + insertionCost,  #insertion
-                matrix[i][j] + cost  #substitution or no change
+                matrix[i][j + 1] + deletionCost,  # deletion
+                matrix[i + 1][j] + insertionCost,  # insertion
+                matrix[i][j] + cost  # substitution or no change
             ])
 
-            if transposition and i >= 1 and j >= 1 and s1[i] == s2[j -
-                                                                   1] and s1[i
-                                                                             -
-                                                                             1] == s2[j]:
+            if (transposition and i >= 1 and j >= 1 and s1[i] == s2[j - 1]
+                    and s1[i - 1] == s2[j]):
                 matrix[i + 1][j + 1] = min(
                     [matrix[i + 1][j + 1], matrix[i - 1][j - 1] + cost])
 
     if printMatrix:
-        print "     ",
+        print("     "),
         for i in s2:
-            print i, "",
+            print(i, "")
         print
         for i, r in enumerate(matrix):
             if i == 0:
-                print " ", r
+                print(" ", r)
             else:
-                print s1[i - 1], r
+                print(s1[i - 1], r)
     if returnMatrix:
         return matrix
     else:
@@ -92,15 +88,15 @@ def dl_ratio(s1, s2, **kw):
 
 def match_list(s, l, **kw):
     '''
-	returns list of elements of l with each element having assigned distance from s
-	'''
+    returns list of elements of l with each element having assigned distance from s
+    '''
     return map(lambda x: (dl_distance(s, x, **kw), x), l)
 
 
 def pick_N(s, l, num=3, **kw):
     ''' picks top N strings from options best matching with s 
-		- if num is set then returns top num results instead of default three
-	'''
+    	- if num is set then returns top num results instead of default three
+    '''
     return sorted(match_list(s, l, **kw))[:num]
 
 
@@ -112,12 +108,12 @@ def pick_one(s, l, **kw):
 
 
 def substring_match(text, s, transposition=True,
-                    **kw):  #TODO: isn't backtracking too greedy?
+                    **kw):  # TODO: isn't backtracking too greedy?
     """
-	fuzzy substring searching for text in s
-	"""
+    fuzzy substring searching for text in s
+    """
     for k in ("nonMatchingEnds", "returnMatrix"):
-        if kw.has_key(k):
+        if k in kw:
             del kw[k]
 
     matrix = dl_distance(
@@ -133,7 +129,7 @@ def substring_match(text, s, transposition=True,
     x = len(matrix[0]) - 1
     y = minimumI
 
-    #backtrack:
+    # backtrack:
     while x > 0:
         locmin = min(matrix[y][x - 1], matrix[y - 1][x - 1], matrix[y - 1][x])
         if matrix[y - 1][x - 1] == locmin:
@@ -167,8 +163,8 @@ def match_substrings(s, l, score=False, **kw):
 
 def pick_N_substrings(s, l, num=3, **kw):
     ''' picks top N substrings from options best matching with s 
-		- if num is set then returns top num results instead of default three
-	'''
+        - if num is set then returns top num results instead of default three
+    '''
     return sorted(match_substrings(s, l, **kw))[:num]
 
 
@@ -180,18 +176,19 @@ def pick_one_substring(s, l, **kw):
 
 
 if __name__ == "__main__":
-    #examples:
+    # examples:
 
     commonErrors = [('a', 'e', 0.4), ('i', 'y', 0.3), ('m', 'n', 0.5)]
     misspellings = [
         "Levenshtain", "Levenstein", "Levinstein", "Levistein", "Levemshtein"
     ]
 
-    print dl_distance('dayme', 'dayne', substitutions=commonErrors)
-    print dl_ratio("Levenshtein", "Levenshtein")
-    print match_list("Levenshtein", misspellings, substitutions=commonErrors)
-    print pick_N("Levenshtein", misspellings, 2, substitutions=commonErrors)
-    print pick_one("Levenshtein", misspellings, substitutions=commonErrors)
+    print(dl_distance('dayme', 'dayne', substitutions=commonErrors))
+    print(dl_ratio("Levenshtein", "Levenshtein"))
+    print(match_list("Levenshtein", misspellings, substitutions=commonErrors))
+    print(pick_N("Levenshtein", misspellings, 2, substitutions=commonErrors))
+    print(pick_one("Levenshtein", misspellings, substitutions=commonErrors))
 
-    print substring_search(
-        "aaaabcegf", "qqqqq aaaaWWbcdefg qqqq", printMatrix=True)
+    print(
+        substring_search(
+            "aaaabcegf", "qqqqq aaaaWWbcdefg qqqq", printMatrix=True))

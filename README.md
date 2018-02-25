@@ -71,5 +71,9 @@ substring_position and substring_score is same as substring_match but returs onl
 
 * printMatrix (defualt False)	- Print matrix of edit distances
 
+#### Similar projects:
+* [python-Levenshtein](https://github.com/ztane/python-Levenshtein/)
+* [fuzzywuzzy](https://github.com/seatgeek/fuzzywuzzy)
+
 ### LICENSE: MIT License
 ### AUTHOR: Jiri Nadvornik: nadvornik.jiri@gmail.com
